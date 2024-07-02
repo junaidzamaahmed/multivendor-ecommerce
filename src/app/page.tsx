@@ -1,5 +1,14 @@
-import Image from "next/image";
+import { SignInButton, SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 export default function Home() {
-  return <main>You may start here</main>;
+  return (
+    <main>
+      <SignedOut>
+        <SignInButton />
+      </SignedOut>
+      <SignedIn>
+        <UserButton />
+      </SignedIn>
+    </main>
+  );
 }
