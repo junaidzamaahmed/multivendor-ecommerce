@@ -66,7 +66,6 @@ export async function POST(req: Request) {
     });
   }
   if (eventType === "user.updated") {
-    const user = await clerkClient.users.getUser(id!);
     await db.user.upsert({
       where: { id: id! },
       update: {},
