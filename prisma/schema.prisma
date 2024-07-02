@@ -16,14 +16,14 @@ datasource db {
 model User {
   id     String  @id
   orders Order[]
-  role   Role    @default(USER)
+  // role   Role    @default(USER)
 }
 
-enum Role {
-  USER
-  STORE
-  ADMIN
-}
+// enum Role {
+//   USER
+//   STORE
+//   ADMIN
+// }
 
 model Product {
   id         Int           @id @default(autoincrement())
