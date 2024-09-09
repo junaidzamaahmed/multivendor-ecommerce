@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 export const metadata: Metadata = {
   title: "Multivendor Ecommerce",
@@ -15,7 +16,10 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className="">{children}</body>
+        <body className="">
+          <Toaster className="bg-black text-white" position="top-center" />
+          {children}
+        </body>
       </html>
     </ClerkProvider>
   );
