@@ -10,8 +10,10 @@ import { toast } from "sonner";
 
 export default function HomePage() {
   const [cartItems, setCartItems] = useState(
-    window.localStorage.getItem("cartItems")
-      ? JSON.parse(window.localStorage.getItem("cartItems")!)
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage.getItem("cartItems")
+        ? JSON.parse(window.localStorage.getItem("cartItems")!)
+        : []
       : []
   );
 

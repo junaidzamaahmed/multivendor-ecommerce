@@ -17,8 +17,10 @@ import React, { useEffect, useState } from "react";
 
 export default function Navbar() {
   const [cartItems, setCartItems] = useState(
-    window.localStorage.getItem("cartItems")
-      ? JSON.parse(window.localStorage.getItem("cartItems")!)
+    typeof window !== "undefined" && window.localStorage
+      ? window.localStorage.getItem("cartItems")
+        ? JSON.parse(window.localStorage.getItem("cartItems")!)
+        : []
       : []
   );
 
