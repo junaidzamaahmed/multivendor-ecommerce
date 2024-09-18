@@ -10,59 +10,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { useCart } from "@/store/cart";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
-import { Menu, Search, ShoppingCart, User, X } from "lucide-react";
+import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
 
 export default function Navbar() {
-  const [cartItems, setCartItems] = useState(
-    typeof window !== "undefined" && window.localStorage
-      ? window.localStorage.getItem("cartItems")
-        ? JSON.parse(window.localStorage.getItem("cartItems")!)
-        : []
-      : []
-  );
+  const { cart, removeFromCart, updateQuantity } = useCart();
 
-  const removeFromCart = (productId: any) => {
-    setCartItems((prevItems: any) =>
-      prevItems.filter((item: any) => item.id !== productId)
-    );
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        "cartItems",
-        JSON.stringify(cartItems.filter((item: any) => item.id !== productId))
-      );
-    }
-  };
-
-  const updateQuantity = (productId: any, newQuantity: any) => {
-    setCartItems((prevItems: any) =>
-      prevItems.map((item: any) =>
-        item.id === productId
-          ? { ...item, quantity: Math.max(1, newQuantity) }
-          : item
-      )
-    );
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(
-        "cartItems",
-        JSON.stringify(
-          cartItems.map((item: any) =>
-            item.id === productId
-              ? { ...item, quantity: Math.max(1, newQuantity) }
-              : item
-          )
-        )
-      );
-    }
-  };
-
-  const totalItems = cartItems.reduce(
+  const totalItems = cart.reduce(
     (sum: any, item: any) => sum + item.quantity,
     0
   );
-  const totalPrice = cartItems.reduce(
+  const totalPrice = cart.reduce(
     (sum: any, item: any) => sum + item.price * item.quantity,
     0
   );
@@ -173,16 +133,24 @@ export default function Navbar() {
                 </SheetDescription>
               </SheetHeader>
               <div className="mt-8 space-y-4">
-                {cartItems.map((item: any) => (
+                {cart.map((item: any) => (
                   <div
                     key={item.id}
                     className="flex items-center justify-between"
                   >
-                    <div>
-                      <h3 className="font-semibold">{item.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        ${item.price.toFixed(2)} each
-                      </p>
+                    <div className="flex space-x-3">
+                      {/* Image */}
+                      <img
+                        src={item.image || ""}
+                        alt={item.title}
+                        className="w-12 h-12 object-cover rounded-lg"
+                      />
+                      <div>
+                        <h3 className="font-semibold">{item.title}</h3>
+                        <p className="text-sm text-gray-500">
+                          ${item.price.toFixed(2)} each
+                        </p>
+                      </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button

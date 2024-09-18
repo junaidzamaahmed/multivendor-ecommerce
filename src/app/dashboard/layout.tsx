@@ -1,3 +1,4 @@
+import { useProducts } from "@/store/products";
 import DashboardNav from "./_components/dashboardNav";
 import DashboardNavMob from "./_components/dashboardNavMob";
 

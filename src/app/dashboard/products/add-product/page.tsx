@@ -40,7 +40,7 @@ export default function InputForm() {
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
-      const response = await axios.post("/api/dashboard/products", data);
+      const response = await axios.post("/api/products", data);
       toast.success("Product added successfully!");
       router.push(`/dashboard/products`);
     } catch (error) {

@@ -1,53 +1,24 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { toast } from "sonner";
+import { useCart } from "@/store/cart";
+import { useProducts } from "@/store/products";
+import { useEffect } from "react";
+import axios from "axios";
 
 export default function HomePage() {
-  const [cartItems, setCartItems] = useState(
-    typeof window !== "undefined" && window.localStorage
-      ? window.localStorage.getItem("cartItems")
-        ? JSON.parse(window.localStorage.getItem("cartItems")!)
-        : []
-      : []
-  );
-
-  const addToCart = (product: any) => {
-    setCartItems((prevItems: any) => {
-      const existingItem = prevItems.find(
-        (item: any) => item.id === product.id
-      );
-      if (existingItem) {
-        return prevItems.map((item: any) =>
-          item.id === product.id
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prevItems, { ...product, quantity: 1 }];
+  const { addToCart } = useCart();
+  const { products, setProducts } = useProducts();
+  useEffect(() => {
+    axios.get("/api/products").then((response) => {
+      setProducts(response.data);
     });
-    if (window != undefined) {
-      window.localStorage.setItem(
-        "cartItems",
-        JSON.stringify([...cartItems, { ...product, quantity: 1 }])
-      );
-      toast.success("Added to cart");
-    }
-  };
-
-  const totalItems = cartItems.reduce(
-    (sum: any, item: any) => sum + item.quantity,
-    0
-  );
-  const totalPrice = cartItems.reduce(
-    (sum: any, item: any) => sum + item.price * item.quantity,
-    0
-  );
+  }, []);
+  console.log(products);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
@@ -117,32 +88,7 @@ export default function HomePage() {
               Featured Products
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                {
-                  id: 1,
-                  name: "Wireless Earbuds",
-                  price: 79.99,
-                  image: "/placeholder.svg?height=400&width=400",
-                },
-                {
-                  id: 2,
-                  name: "Smart Watch",
-                  price: 199.99,
-                  image: "/placeholder.svg?height=400&width=400",
-                },
-                {
-                  id: 3,
-                  name: "Laptop Backpack",
-                  price: 59.99,
-                  image: "/placeholder.svg?height=400&width=400",
-                },
-                {
-                  id: 4,
-                  name: "4K Monitor",
-                  price: 299.99,
-                  image: "/placeholder.svg?height=400&width=400",
-                },
-              ].map((product, index) => (
+              {products?.map((product, index) => (
                 <motion.div
                   key={product.id}
                   initial={{ opacity: 0, y: 20 }}
@@ -151,27 +97,32 @@ export default function HomePage() {
                   className="group flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow"
                 >
                   <div className="relative aspect-square overflow-hidden">
-                    <img
-                      alt={product.name}
-                      className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                      height="400"
-                      src={product.image}
-                      style={{
-                        aspectRatio: "400/400",
-                        objectFit: "cover",
-                      }}
-                      width="400"
-                    />
+                    <Link href={`/products/${product.id}`}>
+                      <img
+                        alt={product.title}
+                        className="object-cover w-full h-full transition-transform group-hover:scale-105"
+                        height="400"
+                        src={product.image || ""}
+                        style={{
+                          aspectRatio: "400/400",
+                          objectFit: "cover",
+                        }}
+                        width="400"
+                      />
+                    </Link>
                   </div>
                   <div className="flex flex-col justify-between flex-1 p-6 bg-white dark:bg-gray-950">
-                    <div>
-                      <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                      </p>
-                    </div>
+                    <Link href={`/products/${product.id}`}>
+                      <div>
+                        <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
+                          {product.title}
+                        </h3>
+                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                          Lorem ipsum dolor sit amet, consectetur adipiscing
+                          elit.
+                        </p>
+                      </div>
+                    </Link>
                     <div className="flex items-center justify-between mt-4">
                       <p className="text-lg font-semibold">
                         ${product.price.toFixed(2)}
