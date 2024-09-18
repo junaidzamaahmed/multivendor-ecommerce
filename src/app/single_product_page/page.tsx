@@ -215,7 +215,7 @@ export default function ProductPage() {
                       </span>
                     </div>
                     <p className="text-sm text-gray-600">
-                      This chair is amazing! It's comfortable for long work
+                      This chair is amazing! It&apos;s comfortable for long work
                       sessions and has great lumbar support.
                     </p>
                   </div>
