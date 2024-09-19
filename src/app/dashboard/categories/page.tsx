@@ -193,8 +193,9 @@ export default function Categories() {
                             </AlertDialogTitle>
                             <AlertDialogDescription>
                               This action cannot be undone. This will
-                              permanently delete the category "{category.name}"
-                              and remove it from our servers.
+                              permanently delete the category &quot;
+                              {category.name}&quot; and remove it from our
+                              servers.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
                           <AlertDialogFooter>
