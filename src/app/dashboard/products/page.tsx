@@ -170,7 +170,14 @@ export default function Dashboard() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuItem>
+                            <Link
+                              className="w-full"
+                              href={`/dashboard/products/edit-product/${product.id}`}
+                            >
+                              Edit
+                            </Link>
+                          </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleDelete(product.id)}
                           >

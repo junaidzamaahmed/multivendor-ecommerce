@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,53 +32,43 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Label } from "@/components/ui/label";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import { useCategories } from "@/store/categories";
 type Category = {
   id: number;
   name: string;
 };
 
 export default function Categories() {
-  const [categories, setCategories] = useState<Category[]>([
-    {
-      id: 1,
-      name: "Electronics",
-    },
-    { id: 2, name: "Clothing" },
-    { id: 3, name: "Books" },
-  ]);
+  const {
+    categories,
+    fetchCategories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+  } = useCategories();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentCategory, setCurrentCategory] = useState<Category | null>(null);
-  const [newCategory, setNewCategory] = useState({ name: "", description: "" });
+  const [newCategory, setNewCategory] = useState({ name: "" });
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(
     null
   );
 
-  const handleAddCategory = () => {
-    const id = Math.max(0, ...categories.map((c) => c.id)) + 1;
-    setCategories([...categories, { id, ...newCategory }]);
-    setNewCategory({ name: "", description: "" });
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const handleAddCategory = async () => {
+    addCategory(newCategory);
     setIsAddModalOpen(false);
   };
 
   const handleEditCategory = () => {
-    if (currentCategory) {
-      setCategories(
-        categories.map((c) =>
-          c.id === currentCategory.id ? currentCategory : c
-        )
-      );
-      setIsEditModalOpen(false);
-    }
+    updateCategory(currentCategory?.id, currentCategory);
+    setIsEditModalOpen(false);
   };
 
-  const handleDeleteCategory = () => {
-    if (categoryToDelete) {
-      setCategories(categories.filter((c) => c.id !== categoryToDelete.id));
-      setCategoryToDelete(null);
-    }
-  };
   return (
     <>
       <div className="flex items-center justify-between">
@@ -209,7 +199,11 @@ export default function Categories() {
                           </AlertDialogHeader>
                           <AlertDialogFooter>
                             <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction onClick={handleDeleteCategory}>
+                            <AlertDialogAction
+                              onClick={() =>
+                                deleteCategory(categoryToDelete?.id)
+                              }
+                            >
                               Yes, delete category
                             </AlertDialogAction>
                           </AlertDialogFooter>

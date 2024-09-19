@@ -10,27 +10,22 @@ export async function POST(req: Request) {
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const product = await db.product.create({
+    const category = await db.category.create({
       data: {
         ...values,
-        userId,
       },
     });
-    return NextResponse.json(product);
+    return NextResponse.json(category);
   } catch (error) {
     console.log("[PRODUCT]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const products = await db.product.findMany({
-      include: {
-        category: true,
-      },
-    });
-    return NextResponse.json(products);
+    const categories = await db.category.findMany();
+    return NextResponse.json(categories);
   } catch (error) {
     console.log("[PRODUCT]", error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -41,15 +36,16 @@ export async function DELETE(req: Request) {
   try {
     const { userId } = auth();
     const { id } = await req.json();
+
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    await db.product.delete({
+    await db.category.delete({
       where: {
-        id: Number(id),
+        id,
       },
     });
-    return new NextResponse("Product deleted successfully");
+    return new NextResponse("Deleted", { status: 200 });
   } catch (error) {
     console.log("[PRODUCT]", error);
     return new NextResponse("Internal Error", { status: 500 });
@@ -60,16 +56,19 @@ export async function PUT(req: Request) {
   try {
     const { userId } = auth();
     const values = await req.json();
+
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const product = await db.product.update({
+    await db.category.update({
       where: {
         id: values.id,
       },
-      data: values,
+      data: {
+        ...values,
+      },
     });
-    return NextResponse.json(product);
+    return new NextResponse("Updated", { status: 200 });
   } catch (error) {
     console.log("[PRODUCT]", error);
     return new NextResponse("Internal Error", { status: 500 });

@@ -193,6 +193,13 @@ export default function Navbar() {
             </SheetContent>
           </Sheet>
           <div>
+            <SignedIn>
+              <Link href={"/dashboard"}>
+                <Button className="flex items-center">Dashboard</Button>
+              </Link>
+            </SignedIn>
+          </div>
+          <div>
             <SignedOut>
               <SignInButton />
             </SignedOut>

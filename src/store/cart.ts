@@ -55,41 +55,4 @@ export const useCart = create<CartState>((set) => ({
       return { cart: newCart };
     });
   },
-
-  // incrementQuantity: (productId: any) => {
-  //   set((state: CartState) => {
-  //     const newCart = state.cart.map((item: any) =>
-  //       item.id === productId ? { ...item, quantity: item.quantity + 1 } : item
-  //     );
-  //     if (window != undefined) {
-  //       window.localStorage.setItem("cartItems", JSON.stringify(newCart));
-  //     }
-  //     return { cart: newCart };
-  //   });
-  // },
-  // decrementQuantity: (productId: any) => {
-  //   set((state: CartState) => {
-  //     const newCart = state.cart.map((item: any) =>
-  //       item.id === productId
-  //         ? { ...item, quantity: Math.max(1, item.quantity - 1) }
-  //         : item
-  //     );
-  //     if (newCart.find((item: any) => item.id === productId).quantity === 0) {
-  //       const filteredCart = newCart.filter(
-  //         (item: any) => item.id !== productId
-  //       );
-  //       if (window != undefined) {
-  //         window.localStorage.setItem(
-  //           "cartItems",
-  //           JSON.stringify(filteredCart)
-  //         );
-  //       }
-  //       return { cart: filteredCart };
-  //     }
-  //     if (window != undefined) {
-  //       window.localStorage.setItem("cartItems", JSON.stringify(newCart));
-  //     }
-  //     return { cart: newCart };
-  //   });
-  // },
 }));

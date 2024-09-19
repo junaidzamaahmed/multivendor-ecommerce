@@ -30,8 +30,8 @@ model Product {
   id         Int       @id @default(autoincrement())
   title      String
   price      Float
-  desc       String?
-  image      String?
+  desc       String    @default("This is the description of the product")
+  image      String    @default("https://www.freshone.com.pk/content/images/thumbs/default-image_550.png")
   orders     Order[]
   categoryId Int?
   category   Category? @relation(fields: [categoryId], references: [id])

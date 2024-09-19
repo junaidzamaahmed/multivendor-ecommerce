@@ -1,3 +1,5 @@
+import axios from "axios";
+import { toast } from "sonner";
 import { create } from "zustand";
 
 type Product = {
@@ -17,10 +19,24 @@ type Product = {
 
 type ProductsState = {
   products: Product[];
+  isLoading: boolean;
   setProducts: (products: Product[]) => void;
+  fetchProducts: () => void;
 };
 
 export const useProducts = create<ProductsState>((set) => ({
   products: [],
+  isLoading: false,
   setProducts: (products: Product[]) => set({ products }),
+  fetchProducts: async () => {
+    try {
+      set({ isLoading: true });
+      const { data } = await axios.get("/api/products");
+      set({ isLoading: false });
+      return set({ products: data });
+    } catch (error) {
+      toast.error("Failed to fetch categories.");
+      set({ isLoading: false });
+    }
+  },
 }));
