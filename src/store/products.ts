@@ -1,4 +1,3 @@
-import db from "@/lib/db";
 import { create } from "zustand";
 
 type Product = {
@@ -8,7 +7,12 @@ type Product = {
   desc: string | null;
   image: string | null;
   categoryId: number | null;
+  stock: number;
   userId: string;
+  category: {
+    id: number;
+    name: string;
+  };
 };
 
 type ProductsState = {

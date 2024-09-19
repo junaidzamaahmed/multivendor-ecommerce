@@ -29,6 +29,9 @@ const FormSchema = z.object({
   image: z.string().url({
     message: "Image must be a valid URL",
   }),
+  stock: z.coerce.number().int().positive({
+    message: "Stock must be a positive integer",
+  }),
 });
 
 export default function InputForm() {
@@ -73,6 +76,19 @@ export default function InputForm() {
               <FormLabel>Price</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="eg. 500" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="stock"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Stock</FormLabel>
+              <FormControl>
+                <Input type="number" placeholder="eg. 50" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -18,7 +18,6 @@ export default function HomePage() {
       setProducts(response.data);
     });
   }, []);
-  console.log(products);
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
