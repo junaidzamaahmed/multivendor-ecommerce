@@ -20,15 +20,6 @@ import { toast } from "sonner";
 import { useProducts } from "@/store/products";
 import { useCategories } from "@/store/categories";
 import { useEffect } from "react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 
 const FormSchema = z.object({
   id: z.number(),
@@ -158,31 +149,6 @@ export default function ProductForm({ product }: { product: any }) {
                 <FormItem>
                   <FormLabel>Category</FormLabel>
                   <FormControl>
-                    {/* <Select
-                      onValueChange={(value) => field.onChange(Number(value))}
-                      defaultValue={String(field.value)}
-                      value={String(field.value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue>
-                          {categories.find(
-                            (category) => category.id === product?.categoryId
-                          )?.name || "Select a category"}
-                        </SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categories.map((category) => (
-                          <SelectItem
-                            key={category.id}
-                            value={22}
-                            {...field}
-                          >
-                            {category.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select> */}
-                    {/* Select Category using html select with nothing selected by default and a beautiful ui */}
                     <select
                       {...field}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-black"

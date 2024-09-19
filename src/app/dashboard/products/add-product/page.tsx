@@ -17,6 +17,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useCategories } from "@/store/categories";
+import { useEffect } from "react";
 
 const FormSchema = z.object({
   title: z.string().min(1, {
@@ -32,6 +34,13 @@ const FormSchema = z.object({
   stock: z.coerce.number().int().positive({
     message: "Stock must be a positive integer",
   }),
+  categoryId: z.preprocess((val) => {
+    if (typeof val === "string") {
+      return parseInt(val);
+    }
+
+    return val;
+  }, z.number()),
 });
 
 export default function InputForm() {
@@ -40,6 +49,11 @@ export default function InputForm() {
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
   });
+  const { categories, fetchCategories } = useCategories();
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
@@ -89,6 +103,29 @@ export default function InputForm() {
               <FormLabel>Stock</FormLabel>
               <FormControl>
                 <Input type="number" placeholder="eg. 50" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="categoryId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Category</FormLabel>
+              <FormControl>
+                <select
+                  {...field}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-black"
+                >
+                  <option value="">Select a category</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
               </FormControl>
               <FormMessage />
             </FormItem>
