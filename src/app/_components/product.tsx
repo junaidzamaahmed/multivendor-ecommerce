@@ -49,7 +49,7 @@ export default function Product({
         </Link>
         <div className="flex items-center justify-between mt-4">
           <p className="text-lg font-semibold">${product.price.toFixed(2)}</p>
-          <Button size="sm" onClick={() => addToCart(product)}>
+          <Button size="sm" onClick={() => addToCart(product, 1)}>
             Add to Cart
           </Button>
         </div>
