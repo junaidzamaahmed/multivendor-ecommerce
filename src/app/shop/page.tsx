@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ChevronDown,
@@ -45,144 +45,41 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { useProducts } from "@/store/products";
+import { useCategories } from "@/store/categories";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
+import Product from "../_components/product";
 
 export default function SearchResultsPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState([0, 1000]);
+  const searchParams = useSearchParams();
+  const [titleSearchQuery, setTitleSearchQuery] = useState(
+    searchParams.get("title") || ""
+  );
+  const [categorySearchQuery, setCategorySearchQuery] = useState<number | null>(
+    Number(searchParams.get("category")) || null
+  );
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [priceRange, setPriceRange] = useState([0, 100000]);
   const [sortBy, setSortBy] = useState("relevance");
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 12;
 
-  const products = [
-    {
-      id: 1,
-      name: "Wireless Earbuds",
-      price: 79.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 2,
-      name: "Smart Watch",
-      price: 199.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 3,
-      name: "Laptop Backpack",
-      price: 59.99,
-      category: "Accessories",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 4,
-      name: "4K Monitor",
-      price: 299.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 5,
-      name: "Ergonomic Keyboard",
-      price: 129.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 6,
-      name: "Wireless Mouse",
-      price: 39.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 7,
-      name: "Desk Lamp",
-      price: 49.99,
-      category: "Home & Office",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 8,
-      name: "Notebook Set",
-      price: 24.99,
-      category: "Stationery",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 9,
-      name: "Portable Charger",
-      price: 49.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 10,
-      name: "Wireless Keyboard",
-      price: 89.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 11,
-      name: "Desk Organizer",
-      price: 34.99,
-      category: "Home & Office",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 12,
-      name: "Laptop Stand",
-      price: 39.99,
-      category: "Accessories",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 13,
-      name: "Noise-Canceling Headphones",
-      price: 249.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 14,
-      name: "Wireless Presenter",
-      price: 29.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 15,
-      name: "USB Hub",
-      price: 19.99,
-      category: "Electronics",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-    {
-      id: 16,
-      name: "Desk Plant",
-      price: 14.99,
-      category: "Home & Office",
-      image: "/placeholder.svg?height=200&width=200",
-    },
-  ];
+  const { products, fetchProducts } = useProducts();
+  const { categories, fetchCategories } = useCategories();
 
-  const categories = [
-    "Electronics",
-    "Accessories",
-    "Home & Office",
-    "Stationery",
-  ];
+  useEffect(() => {
+    fetchProducts();
+    fetchCategories();
+  }, []);
 
   const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name
+    const matchesSearch = product.title
       .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+      .includes(titleSearchQuery.toLowerCase());
     const matchesCategory =
       selectedCategories.length === 0 ||
-      selectedCategories.includes(product.category);
+      selectedCategories.includes(product?.category?.id);
     const matchesPrice =
       product.price >= priceRange[0] && product.price <= priceRange[1];
     return matchesSearch && matchesCategory && matchesPrice;
@@ -202,139 +99,52 @@ export default function SearchResultsPage() {
     indexOfLastProduct
   );
 
+  const router = useRouter();
   const handleCategoryChange = (category: any) => {
     setSelectedCategories((prev) =>
-      prev.includes(category)
-        ? prev.filter((c) => c !== category)
-        : [...prev, category]
+      prev.includes(category?.id)
+        ? prev.filter((c) => c !== category?.id)
+        : [...prev, category?.id]
     );
+    const titleTemp = searchParams.get("title") || "";
+    const titleString = titleTemp ? `title=${titleTemp}` : "";
+    if (searchParams.getAll("category").includes(category?.id.toString())) {
+      const temp = searchParams
+        .getAll("category")
+        .filter((c) => c !== category?.id.toString());
+      var catString = "";
+      temp.forEach((c) => {
+        catString += `&category=${c}`;
+      });
+      router.replace(`/shop?${titleString}${catString}`);
+    } else {
+      const temp = searchParams.getAll("category");
+      var catString = "";
+      temp.forEach((c) => {
+        catString += `&category=${c}`;
+      });
+      catString += `&category=${category?.id}`;
+      router.replace(`/shop?${titleString}${catString}`);
+    }
     setCurrentPage(1);
   };
 
   const handlePageChange = (pageNumber: number) => {
     setCurrentPage(pageNumber);
   };
-
+  useEffect(() => {
+    setTitleSearchQuery(searchParams.get("title") || "");
+    setCategorySearchQuery(Number(searchParams.get("category")) || null);
+    if (Number(searchParams.get("category"))) {
+      setSelectedCategories((prev) =>
+        prev.includes(Number(searchParams.get("category")))
+          ? prev
+          : [...prev, Number(searchParams.get("category"))]
+      );
+    }
+  }, [searchParams]);
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <header className="sticky top-0 z-50 w-full border-b bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
-        <div className="container flex h-16 items-center">
-          <div className="mr-4 hidden md:flex">
-            <Link className="mr-6 flex items-center space-x-2" href="/">
-              <span className="hidden font-bold text-xl bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent sm:inline-block">
-                ACME Store
-              </span>
-            </Link>
-            <nav className="flex items-center space-x-6 text-sm font-medium">
-              <Link
-                href="/products"
-                className="text-foreground/60 transition-colors hover:text-foreground/80"
-              >
-                Products
-              </Link>
-              <Link
-                href="/categories"
-                className="text-foreground/60 transition-colors hover:text-foreground/80"
-              >
-                Categories
-              </Link>
-              <Link
-                href="/deals"
-                className="text-foreground/60 transition-colors hover:text-foreground/80"
-              >
-                Deals
-              </Link>
-              <Link
-                href="/about"
-                className="text-foreground/60 transition-colors hover:text-foreground/80"
-              >
-                About
-              </Link>
-            </nav>
-          </div>
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="mr-2 md:hidden">
-                <Menu className="h-5 w-5" />
-                <span className="sr-only">Toggle Menu</span>
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left">
-              <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
-                <SheetDescription>Navigate through our store</SheetDescription>
-              </SheetHeader>
-              <nav className="flex flex-col space-y-4 mt-4">
-                <Link
-                  href="/products"
-                  className="text-foreground/60 transition-colors hover:text-foreground/80"
-                >
-                  Products
-                </Link>
-                <Link
-                  href="/categories"
-                  className="text-foreground/60 transition-colors hover:text-foreground/80"
-                >
-                  Categories
-                </Link>
-                <Link
-                  href="/deals"
-                  className="text-foreground/60 transition-colors hover:text-foreground/80"
-                >
-                  Deals
-                </Link>
-                <Link
-                  href="/about"
-                  className="text-foreground/60 transition-colors hover:text-foreground/80"
-                >
-                  About
-                </Link>
-              </nav>
-            </SheetContent>
-          </Sheet>
-          <div className="flex w-full items-center gap-4 md:w-auto">
-            <form
-              className="flex-1 md:flex-initial"
-              onSubmit={(e) => e.preventDefault()}
-            >
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search products..."
-                  className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background/50"
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
-            </form>
-            <Button variant="ghost" size="icon" className="ml-auto relative">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="sr-only">Cart</span>
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <User className="h-5 w-5" />
-                  <span className="sr-only">User menu</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Orders</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>Log out</DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </header>
       <main className="flex-1 container py-8">
         <h1 className="text-3xl font-bold mb-8">Search Results</h1>
         <div className="flex flex-col md:flex-row gap-8">
@@ -348,21 +158,21 @@ export default function SearchResultsPage() {
                     <div className="space-y-2">
                       {categories.map((category) => (
                         <div
-                          key={category}
+                          key={category.id}
                           className="flex items-center space-x-2"
                         >
                           <Checkbox
-                            id={category}
-                            checked={selectedCategories.includes(category)}
+                            id={category.id.toString()}
+                            checked={selectedCategories.includes(category.id)}
                             onCheckedChange={() =>
                               handleCategoryChange(category)
                             }
                           />
                           <label
-                            htmlFor={category}
+                            htmlFor={category.id.toString()}
                             className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                           >
-                            {category}
+                            {category.name}
                           </label>
                         </div>
                       ))}
@@ -435,41 +245,8 @@ export default function SearchResultsPage() {
               </Select>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {currentProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="group flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative aspect-square overflow-hidden">
-                    <img
-                      alt={product.name}
-                      className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                      height="200"
-                      src={product.image}
-                      style={{
-                        aspectRatio: "200/200",
-                        objectFit: "cover",
-                      }}
-                      width="200"
-                    />
-                  </div>
-                  <div className="flex flex-col justify-between flex-1 p-6 bg-white dark:bg-gray-950">
-                    <div>
-                      <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                        {product.category}
-                      </p>
-                    </div>
-                    <div className="flex items-center justify-between mt-4">
-                      <p className="text-lg font-semibold">
-                        ${product.price.toFixed(2)}
-                      </p>
-                      <Button size="sm">Add to Cart</Button>
-                    </div>
-                  </div>
-                </div>
+              {currentProducts.map((product, index) => (
+                <Product key={product.id} product={product} index={index} />
               ))}
             </div>
             <div className="flex justify-center items-center space-x-2 mt-8">

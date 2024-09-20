@@ -3,7 +3,7 @@ import { create } from "zustand";
 
 type CartState = {
   cart: { id: number; title: string; price: number; quantity: number }[];
-  addToCart: (product: any) => void;
+  addToCart: (product: any, quantity: number) => void;
   removeFromCart: (productId: any) => void;
   updateQuantity: (productId: any, newQuantity: any) => void;
 };
@@ -15,23 +15,23 @@ export const useCart = create<CartState>((set) => ({
         ? JSON.parse(window.localStorage.getItem("cartItems")!)
         : []
       : [],
-  addToCart: (product) => {
+  addToCart: (product, quantity = 1) => {
     set((state: CartState) => {
       const existing = state.cart.find((item: any) => item.id === product.id);
       if (existing) {
-        existing.quantity += 1;
+        existing.quantity += quantity;
         if (window != undefined) {
           window.localStorage.setItem("cartItems", JSON.stringify(state.cart));
         }
         return { cart: state.cart };
       }
-      const newCart = [...state.cart, { ...product, quantity: 1 }];
+      const newCart = [...state.cart, { ...product, quantity: quantity }];
       if (window != undefined) {
         window.localStorage.setItem("cartItems", JSON.stringify(newCart));
       }
       return { cart: newCart };
     });
-    toast.success(`Item added to cart ${product.name}`);
+    toast.success(`Item added to cart ${product.title}`);
   },
   removeFromCart: (productId: any) => {
     set((state: CartState) => {

@@ -62,13 +62,16 @@ export async function POST(req: Request) {
     await db.user.create({
       data: {
         id: id!,
+        name: evt.data.first_name + " " + evt.data.last_name,
       },
     });
   }
   if (eventType === "user.updated") {
     await db.user.upsert({
       where: { id: id! },
-      update: {},
+      update: {
+        name: evt.data.first_name + " " + evt.data.last_name,
+      },
       create: {
         id: id!,
       },
@@ -77,6 +80,29 @@ export async function POST(req: Request) {
   if (eventType === "user.deleted") {
     await db.user.delete({
       where: { id: id! },
+    });
+  }
+  if (eventType === "session.created") {
+    // Create a new session in your database
+    if (!id) {
+      return new Response("Error occured -- no svix headers", {
+        status: 400,
+      });
+    }
+    const users = await clerkClient.users.getUserList();
+    users.data.forEach(async (user) => {
+      await db.user.upsert({
+        where: {
+          id: user.id,
+        },
+        update: {
+          name: user.firstName + " " + user.lastName,
+        },
+        create: {
+          id: user.id,
+          name: user.firstName + " " + user.lastName,
+        },
+      });
     });
   }
 

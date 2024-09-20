@@ -14,6 +14,8 @@ import { useCart } from "@/store/cart";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Navbar() {
   const { cart, removeFromCart, updateQuantity } = useCart();
@@ -26,6 +28,38 @@ export default function Navbar() {
     (sum: any, item: any) => sum + item.price * item.quantity,
     0
   );
+
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const categoryParams = searchParams.get("category");
+  const handleSearchSubmit = (e: any) => {
+    e.preventDefault();
+    const searchQuery = e.target.elements.search.value;
+    if (pathname === "/shop") {
+      router.replace(
+        `/shop?title=${searchQuery}${
+          categoryParams ? `&category=${categoryParams}` : ""
+        }`
+      );
+    } else if (searchQuery.length >= 3) {
+      if (pathname === "/shop") {
+        router.replace(
+          `/shop?title=${searchQuery}${
+            categoryParams ? `&category=${categoryParams}` : ""
+          }`
+        );
+      } else {
+        router.push(
+          `/shop?title=${searchQuery}${
+            categoryParams ? `&category=${categoryParams}` : ""
+          }`
+        );
+      }
+    } else {
+      toast.error("Please enter at least 3 characters to search");
+    }
+  };
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/80 dark:bg-gray-950/80 backdrop-blur-md">
       <div className="container flex h-16 items-center justify-between">
@@ -37,28 +71,16 @@ export default function Navbar() {
           </Link>
           <nav className="flex items-center space-x-6 text-sm font-medium">
             <Link
-              href="/products"
+              href="/shop"
               className="text-foreground/60 transition-colors hover:text-foreground/80"
             >
               Products
             </Link>
             <Link
-              href="/categories"
+              href="/#categories"
               className="text-foreground/60 transition-colors hover:text-foreground/80"
             >
               Categories
-            </Link>
-            <Link
-              href="/deals"
-              className="text-foreground/60 transition-colors hover:text-foreground/80"
-            >
-              Deals
-            </Link>
-            <Link
-              href="/about"
-              className="text-foreground/60 transition-colors hover:text-foreground/80"
-            >
-              About
             </Link>
           </nav>
         </div>
@@ -103,10 +125,15 @@ export default function Navbar() {
           </SheetContent>
         </Sheet>
         <div className="flex w-full items-center gap-4 md:w-auto">
-          <form className="flex-1 md:flex-initial">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="flex-1 md:flex-initial"
+          >
             <div className="relative">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
               <Input
+                defaultValue={searchParams.get("title") || ""}
+                name="search"
                 type="search"
                 placeholder="Search products..."
                 className="pl-8 sm:w-[300px] md:w-[200px] lg:w-[300px] bg-background/50"

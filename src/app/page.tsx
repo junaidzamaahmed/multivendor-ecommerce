@@ -5,18 +5,20 @@ import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useCart } from "@/store/cart";
 import { useProducts } from "@/store/products";
 import { useEffect } from "react";
 import axios from "axios";
+import { useCategories } from "@/store/categories";
+import Product from "./_components/product";
 
 export default function HomePage() {
-  const { addToCart } = useCart();
   const { products, setProducts } = useProducts();
+  const { categories, fetchCategories } = useCategories();
   useEffect(() => {
     axios.get("/api/products").then((response) => {
       setProducts(response.data);
     });
+    fetchCategories();
   }, []);
 
   return (
@@ -51,28 +53,19 @@ export default function HomePage() {
               Categories
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {[
-                "Electronics",
-                "Clothing",
-                "Home & Garden",
-                "Sports",
-                "Beauty",
-                "Books",
-              ].map((category, index) => (
+              {categories.map((category, index) => (
                 <motion.div
-                  key={category}
+                  key={category.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                 >
                   <Link
                     className="group relative flex items-center justify-center h-48 rounded-lg bg-white shadow-md overflow-hidden hover:shadow-lg transition-shadow dark:bg-gray-950"
-                    href={`/category/${category
-                      .toLowerCase()
-                      .replace(" & ", "-")}`}
+                    href={`/shop?category=${category.id}`}
                   >
                     <h3 className="text-2xl font-semibold text-center z-10 transition-transform group-hover:scale-110">
-                      {category}
+                      {category.name}
                     </h3>
                     <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity" />
                   </Link>
@@ -88,50 +81,7 @@ export default function HomePage() {
             </h2>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {products?.map((product, index) => (
-                <motion.div
-                  key={product.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group flex flex-col overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow"
-                >
-                  <div className="relative aspect-square overflow-hidden">
-                    <Link href={`/products/${product.id}`}>
-                      <img
-                        alt={product.title}
-                        className="object-cover w-full h-full transition-transform group-hover:scale-105"
-                        height="400"
-                        src={product.image || ""}
-                        style={{
-                          aspectRatio: "400/400",
-                          objectFit: "cover",
-                        }}
-                        width="400"
-                      />
-                    </Link>
-                  </div>
-                  <div className="flex flex-col justify-between flex-1 p-6 bg-white dark:bg-gray-950">
-                    <Link href={`/products/${product.id}`}>
-                      <div>
-                        <h3 className="text-lg font-semibold group-hover:text-primary transition-colors">
-                          {product.title}
-                        </h3>
-                        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                          Lorem ipsum dolor sit amet, consectetur adipiscing
-                          elit.
-                        </p>
-                      </div>
-                    </Link>
-                    <div className="flex items-center justify-between mt-4">
-                      <p className="text-lg font-semibold">
-                        ${product.price.toFixed(2)}
-                      </p>
-                      <Button size="sm" onClick={() => addToCart(product)}>
-                        Add to Cart
-                      </Button>
-                    </div>
-                  </div>
-                </motion.div>
+                <Product key={product.id} product={product} index={index} />
               ))}
             </div>
           </div>
