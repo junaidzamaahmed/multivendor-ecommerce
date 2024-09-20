@@ -15,7 +15,7 @@ datasource db {
 
 model User {
   id       String    @id
-  name     String    @default("Anonymous")
+  name     String
   orders   Order[]
   products Product[]
   reviews  Review[]

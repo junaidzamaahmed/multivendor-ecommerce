@@ -74,6 +74,7 @@ export async function POST(req: Request) {
       },
       create: {
         id: id!,
+        name: evt.data.first_name + " " + evt.data.last_name,
       },
     });
   }
