@@ -107,11 +107,8 @@ export default function CustomerDashboard() {
   };
 
   const { userId } = useAuth();
-  if (!userId) {
-    return <div>Unauthorized</div>;
-  }
   useEffect(() => {
-    fetchUserOrders(userId);
+    fetchUserOrders(userId!);
   }, []);
   const OrdersTab = () => (
     <Card>
