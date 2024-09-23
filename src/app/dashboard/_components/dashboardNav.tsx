@@ -1,21 +1,25 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import {
-  Bell,
   Home,
   LineChart,
   MessagesSquare,
   Package,
   Package2,
   ShoppingCart,
-  Users,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { usePathname } from "next/navigation";
+import { useOrder } from "@/store/orders";
 export default function DashboardNav() {
   const path = usePathname();
+  const { orders, fetchOrders } = useOrder();
+  const pendingOrders = orders.filter((order) => order.status !== "delivered");
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
   const nav = [
     {
       icon: <Home className="h-4 w-4" />,
@@ -27,7 +31,7 @@ export default function DashboardNav() {
       icon: <ShoppingCart className="h-4 w-4" />,
       title: "Orders",
       href: "/dashboard/orders",
-      badge: 6,
+      badge: pendingOrders.length,
     },
     {
       icon: <Package2 className="h-4 w-4" />,
