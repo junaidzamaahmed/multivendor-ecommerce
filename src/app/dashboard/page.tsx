@@ -211,7 +211,7 @@ export default function Dashboard() {
                     <DialogTitle>Edit Store Details</DialogTitle>
                     <DialogDescription>
                       Make changes to your store details here. Click save when
-                      you're done.
+                      you&apos;re done.
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
@@ -490,8 +490,8 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle>Welcome to the Seller Dashboard</CardTitle>
               <CardDescription>
-                You haven't created a store yet. Get started by creating your
-                store now!
+                You haven&apos;t created a store yet. Get started by creating
+                your store now!
               </CardDescription>
             </CardHeader>
             <CardContent>
