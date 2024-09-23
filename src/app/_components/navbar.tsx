@@ -11,7 +11,13 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useCart } from "@/store/cart";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import { Menu, Search, ShoppingCart, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -28,6 +34,9 @@ export default function Navbar() {
     (sum: any, item: any) => sum + item.price * item.quantity,
     0
   );
+
+  const { user } = useUser();
+  const role = user?.publicMetadata.role;
 
   const router = useRouter();
   const pathname = usePathname();
@@ -215,14 +224,30 @@ export default function Navbar() {
                   <span>Total</span>
                   <span>${totalPrice.toFixed(2)}</span>
                 </div>
-                <Button className="w-full">Checkout</Button>
+                <Link href="/checkout">
+                  <Button className="w-full mt-2">Checkout</Button>
+                </Link>
               </div>
             </SheetContent>
           </Sheet>
           <div>
             <SignedIn>
-              <Link href={"/dashboard"}>
-                <Button className="flex items-center">Dashboard</Button>
+              <Link
+                href={
+                  role == "seller"
+                    ? "/dashboard"
+                    : role == "user"
+                    ? "my-orders"
+                    : "/admin-panel"
+                }
+              >
+                <Button className="flex items-center">
+                  {role == "seller"
+                    ? "Dashboard"
+                    : role == "user"
+                    ? "My Orders"
+                    : "Admin Panel"}
+                </Button>
               </Link>
             </SignedIn>
           </div>

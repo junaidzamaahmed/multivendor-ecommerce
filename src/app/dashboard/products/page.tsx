@@ -23,6 +23,7 @@ import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { toast } from "sonner";
+import { useStore } from "@/store/store";
 
 const Pagination = ({
   currentPage,
@@ -101,12 +102,17 @@ const Pagination = ({
 };
 
 export default function Dashboard() {
-  const { products, setProducts } = useProducts();
+  const { store, fetchUserStore } = useStore();
+  const { products, setProducts, fetchStoreProducts } = useProducts();
+
   useEffect(() => {
-    axios.get("/api/products").then((response) => {
-      setProducts(response.data);
-    });
+    fetchUserStore();
   }, []);
+  useEffect(() => {
+    if (store) {
+      fetchStoreProducts(store.id);
+    }
+  }, [store]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -137,78 +143,86 @@ export default function Dashboard() {
     <>
       <div className="flex justify-between items-center">
         <h1 className="text-lg font-semibold md:text-2xl">Products</h1>
-        <Link href="/dashboard/products/add-product">
-          <Button className="mt-4">Add Product</Button>
-        </Link>
+        {store && (
+          <Link href="/dashboard/products/add-product">
+            <Button className="mt-4">Add Product</Button>
+          </Link>
+        )}
       </div>
       <div x-chunk="dashboard-02-chunk-1">
-        {products ? (
-          <div className="bg-white shadow overflow-hidden sm:rounded-lg p-4">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Price</TableHead>
-                  <TableHead>Stock</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {currentProducts.map((product) => (
-                  <TableRow key={product?.id}>
-                    <TableCell>{product?.title}</TableCell>
-                    <TableCell>{product?.category?.name}</TableCell>
-                    <TableCell>${product?.price?.toFixed(2)}</TableCell>
-                    <TableCell>{product.stock}</TableCell>
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem>
-                            <Link
-                              className="w-full"
-                              href={`/dashboard/products/edit-product/${product.id}`}
-                            >
-                              Edit
-                            </Link>
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() => handleDelete(product.id)}
-                          >
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+        {store ? (
+          products ? (
+            <div className="bg-white shadow overflow-hidden sm:rounded-lg p-4">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Price</TableHead>
+                    <TableHead>Stock</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-            />
-          </div>
-        ) : (
-          <div>
-            <div className="flex flex-col items-center gap-1 text-center">
-              <h3 className="text-2xl font-bold tracking-tight">
-                You have no products
-              </h3>
-              <p className="text-sm text-muted-foreground">
-                You can start selling as soon as you add a product.
-              </p>
-              <Link href="/dashboard/products/add-product">
-                <Button className="mt-4">Add Product</Button>
-              </Link>
+                </TableHeader>
+                <TableBody>
+                  {currentProducts.map((product) => (
+                    <TableRow key={product?.id}>
+                      <TableCell>{product?.title}</TableCell>
+                      <TableCell>{product?.category?.name}</TableCell>
+                      <TableCell>${product?.price?.toFixed(2)}</TableCell>
+                      <TableCell>{product.stock}</TableCell>
+                      <TableCell>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0">
+                              <span className="sr-only">Open menu</span>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem>
+                              <Link
+                                className="w-full"
+                                href={`/dashboard/products/edit-product/${product.id}`}
+                              >
+                                Edit
+                              </Link>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(product.id)}
+                            >
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+              />
             </div>
+          ) : (
+            <div>
+              <div className="flex flex-col items-center gap-1 text-center">
+                <h3 className="text-2xl font-bold tracking-tight">
+                  You have no products
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  You can start selling as soon as you add a product.
+                </p>
+                <Link href="/dashboard/products/add-product">
+                  <Button className="mt-4">Add Product</Button>
+                </Link>
+              </div>
+            </div>
+          )
+        ) : (
+          <div className="flex items-center justify-center h-32">
+            You do not have a store at this moment!
           </div>
         )}
       </div>

@@ -19,37 +19,65 @@ model User {
   orders   Order[]
   products Product[]
   reviews  Review[]
-  // role   Role    @default(USER)
+  storeId  Int?
+  Store    Store?    @relation(fields: [storeId], references: [id])
 }
 
-// enum Role {
-//   USER
-//   STORE
-//   ADMIN
-// }
+model Store {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String
+  phone        String
+  profileImage String?
+  coverImage   String?
+  description  String
+  products     Product[]
+  users        User[]
+}
 
 model Product {
-  id         Int       @id @default(autoincrement())
+  id         Int            @id @default(autoincrement())
   title      String
   price      Float
-  desc       String    @default("This is the description of the product")
-  image      String    @default("https://www.freshone.com.pk/content/images/thumbs/default-image_550.png")
-  orders     Order[]
+  desc       String         @default("This is the description of the product")
+  image      String         @default("https://www.freshone.com.pk/content/images/thumbs/default-image_550.png")
   categoryId Int?
-  category   Category? @relation(fields: [categoryId], references: [id])
-  stock      Int       @default(100)
+  category   Category?      @relation(fields: [categoryId], references: [id])
+  stock      Int            @default(100)
   userId     String
-  user       User      @relation(fields: [userId], references: [id])
+  user       User           @relation(fields: [userId], references: [id])
   reviews    Review[]
+  Store      Store          @relation(fields: [storeId], references: [id])
+  storeId    Int
+  orders     ProductOrder[]
 }
 
 model Order {
-  id        Int       @id @default(autoincrement())
+  id        Int            @id @default(autoincrement())
   userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  products  Product[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  user      User           @relation(fields: [userId], references: [id])
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  status    String         @default("Pending")
+  products  ProductOrder[]
+  tax       Float          @default(0.0)
+  shipping  Float          @default(0.0)
+  total     Float          @default(0.0)
+  address   String
+  city      String
+  country   String
+  zip       String
+  state     String
+}
+
+model ProductOrder {
+  id        Int     @id @default(autoincrement())
+  productId Int
+  product   Product @relation(fields: [productId], references: [id])
+  orderId   Int
+  order     Order   @relation(fields: [orderId], references: [id])
+  quantity  Int
+  price     Float
 }
 
 model Category {
@@ -66,5 +94,14 @@ model Review {
   product   Product  @relation(fields: [productId], references: [id])
   rating    Int
   comment   String
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  phone     String?
   createdAt DateTime @default(now())
 }

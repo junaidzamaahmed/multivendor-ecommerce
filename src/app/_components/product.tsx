@@ -47,11 +47,29 @@ export default function Product({
             </p>
           </div>
         </Link>
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-lg font-semibold">${product.price.toFixed(2)}</p>
-          <Button size="sm" onClick={() => addToCart(product, 1)}>
-            Add to Cart
-          </Button>
+        <div>
+          <div>
+            <Link
+              href={`/shop?category=${product.category.id}`}
+              className="text-sm font-semibold text-gray-600 dark:text-gray-400"
+            >
+              {product.category?.name}
+            </Link>
+          </div>
+          <div>
+            <Link
+              href={`/store/${product.storeId}`}
+              className="text-sm font-semibold text-gray-600 dark:text-gray-400"
+            >
+              {product.Store?.name}
+            </Link>
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <p className="text-lg font-semibold">${product.price.toFixed(2)}</p>
+            <Button size="sm" onClick={() => addToCart(product, 1)}>
+              Add to Cart
+            </Button>
+          </div>{" "}
         </div>
       </div>
     </motion.div>

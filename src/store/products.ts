@@ -22,6 +22,7 @@ type ProductsState = {
   isLoading: boolean;
   setProducts: (products: Product[]) => void;
   fetchProducts: () => void;
+  fetchStoreProducts: (storeId: string) => void;
 };
 
 export const useProducts = create<ProductsState>((set) => ({
@@ -32,6 +33,17 @@ export const useProducts = create<ProductsState>((set) => ({
     try {
       set({ isLoading: true });
       const { data } = await axios.get("/api/products");
+      set({ isLoading: false });
+      return set({ products: data });
+    } catch (error) {
+      toast.error("Failed to fetch products.");
+      set({ isLoading: false });
+    }
+  },
+  fetchStoreProducts: async (storeId: string) => {
+    try {
+      set({ isLoading: true });
+      const { data } = await axios.get(`/api/products/${storeId}`);
       set({ isLoading: false });
       return set({ products: data });
     } catch (error) {

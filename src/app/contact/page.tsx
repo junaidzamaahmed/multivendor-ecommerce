@@ -2,33 +2,19 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import {
-  MapPin,
-  Phone,
-  Mail,
-  Clock,
-  Send,
-  ChevronDown,
-  ChevronUp,
-} from "lucide-react";
+import { MapPin, Phone, Mail, Clock, Send } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import axios from "axios";
+import { toast } from "sonner";
 
 const ContactInfo = ({
   icon,
@@ -55,7 +41,6 @@ export default function ContactUs() {
     name: "",
     email: "",
     phone: "",
-    subject: "",
     message: "",
   });
 
@@ -66,10 +51,25 @@ export default function ContactUs() {
     setFormData((prevData) => ({ ...prevData, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Here you would typically send the form data to your backend
+    try {
+      if (!formData.name || !formData.email || !formData.message) {
+        return toast.error("Name, email, and message are required.");
+      }
+      await axios.post("/api/contact", formData);
+      setFormData({
+        name: "",
+        email: "",
+        phone: "",
+        message: "",
+      });
+      toast.success(
+        "Message sent successfully. We will get back to you soon via email or phone."
+      );
+    } catch (error) {
+      toast.error("Failed to send message.");
+    }
   };
 
   return (

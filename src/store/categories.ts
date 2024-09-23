@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { create } from "zustand";
 
 type CategoryState = {
-  categories: { id: number; name: string }[];
+  categories: any[];
   setCategories: (categories: any) => void;
   fetchCategories: () => void;
   addCategory: (newCategory: any) => void;

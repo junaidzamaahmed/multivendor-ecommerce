@@ -4,6 +4,7 @@ import {
   Home,
   LineChart,
   Menu,
+  MessagesSquare,
   Package,
   Package2,
   ShoppingCart,
@@ -26,7 +27,7 @@ export default function DashboardNavMob() {
     {
       icon: <ShoppingCart className="h-4 w-4" />,
       title: "Orders",
-      href: "#",
+      href: "/dashboard/orders",
       badge: 6,
     },
     {
@@ -42,15 +43,15 @@ export default function DashboardNavMob() {
       badge: 0,
     },
     {
-      icon: <Users className="h-4 w-4" />,
-      title: "Customers",
-      href: "#",
+      icon: <MessagesSquare className="h-4 w-4" />,
+      title: "Messages",
+      href: "/dashboard/messages",
       badge: 0,
     },
     {
       icon: <LineChart className="h-4 w-4" />,
       title: "Analytics",
-      href: "#",
+      href: "/dashboard/analytics",
       badge: 0,
     },
   ];

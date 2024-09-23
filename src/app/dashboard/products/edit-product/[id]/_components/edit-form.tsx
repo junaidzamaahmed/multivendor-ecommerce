@@ -153,7 +153,6 @@ export default function ProductForm({ product }: { product: any }) {
                       {...field}
                       className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-black"
                     >
-                      <option value="">Select a category</option>
                       {categories.map((category) => (
                         <option key={category.id} value={category.id}>
                           {category.name}

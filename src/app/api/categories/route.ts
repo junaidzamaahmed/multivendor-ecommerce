@@ -24,7 +24,11 @@ export async function POST(req: Request) {
 
 export async function GET() {
   try {
-    const categories = await db.category.findMany();
+    const categories = await db.category.findMany({
+      include: {
+        products: true,
+      },
+    });
     return NextResponse.json(categories);
   } catch (error) {
     console.log("[PRODUCT]", error);

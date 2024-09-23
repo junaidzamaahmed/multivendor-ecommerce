@@ -10,52 +10,58 @@ export async function POST(req: Request) {
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const product = await db.product.create({
-      data: {
-        ...values,
-        userId,
-      },
+    const [store, updateUser] = await db.$transaction(async (db) => {
+      const store = await db.store.create({
+        data: {
+          ...values,
+          users: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      });
+      const updateUser = await db.user.update({
+        where: {
+          id: userId,
+        },
+        data: {
+          storeId: store.id,
+        },
+      });
+      return [store, updateUser];
     });
-    return NextResponse.json(product);
+    return NextResponse.json([store, updateUser]);
   } catch (error) {
-    console.log("[PRODUCT]", error);
+    console.log("[STORE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
 
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url);
-    const storeId = url.searchParams.get("storeId");
-    const products = await db.product.findMany({
-      include: {
-        category: true,
-        Store: true,
-      },
-    });
-
-    return NextResponse.json(products);
-  } catch (error) {
-    console.log("[PRODUCT]", error);
-    return new NextResponse("Internal Error", { status: 500 });
-  }
-}
-
-export async function DELETE(req: Request) {
-  try {
     const { userId } = auth();
-    const { id } = await req.json();
+
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    await db.product.delete({
-      where: {
-        id: Number(id),
+    const store = await db.store.findMany({
+      // where: {
+      //   users: {
+      //     some: {
+      //       id: userId,
+      //     },
+      //   },
+      // },
+      include: {
+        // users: true,
+        products: true,
+        // orders: true,
       },
     });
-    return new NextResponse("Product deleted successfully");
+    return NextResponse.json(store);
   } catch (error) {
-    console.log("[PRODUCT]", error);
+    console.log("[STORE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }
@@ -64,18 +70,19 @@ export async function PUT(req: Request) {
   try {
     const { userId } = auth();
     const values = await req.json();
+
     if (!userId) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-    const product = await db.product.update({
+    const store = await db.store.update({
       where: {
         id: values.id,
       },
       data: values,
     });
-    return NextResponse.json(product);
+    return NextResponse.json(store);
   } catch (error) {
-    console.log("[PRODUCT]", error);
+    console.log("[STORE]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
 }

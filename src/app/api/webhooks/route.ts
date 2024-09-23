@@ -83,29 +83,29 @@ export async function POST(req: Request) {
       where: { id: id! },
     });
   }
-  if (eventType === "session.created") {
-    // Create a new session in your database
-    if (!id) {
-      return new Response("Error occured -- no svix headers", {
-        status: 400,
-      });
-    }
-    const users = await clerkClient.users.getUserList();
-    users.data.forEach(async (user) => {
-      await db.user.upsert({
-        where: {
-          id: user.id,
-        },
-        update: {
-          name: user.firstName + " " + user.lastName,
-        },
-        create: {
-          id: user.id,
-          name: user.firstName + " " + user.lastName,
-        },
-      });
-    });
-  }
+  // if (eventType === "session.created") {
+  //   // Create a new session in your database
+  //   if (!id) {
+  //     return new Response("Error occured -- no svix headers", {
+  //       status: 400,
+  //     });
+  //   }
+  //   const users = await clerkClient.users.getUserList();
+  //   users.data.forEach(async (user) => {
+  //     await db.user.upsert({
+  //       where: {
+  //         id: user.id,
+  //       },
+  //       update: {
+  //         name: user.firstName + " " + user.lastName,
+  //       },
+  //       create: {
+  //         id: user.id,
+  //         name: user.firstName + " " + user.lastName,
+  //       },
+  //     });
+  //   });
+  // }
 
   return new Response("", { status: 200 });
 }
