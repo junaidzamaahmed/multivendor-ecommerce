@@ -182,7 +182,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="mt-8 text-sm text-center text-gray-500 dark:text-gray-400">
-            © 2023 ACME Store. All rights reserved.
+            © 2024 ACME Store. All rights reserved.
           </div>
         </div>
       </footer>

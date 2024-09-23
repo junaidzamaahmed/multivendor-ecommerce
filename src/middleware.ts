@@ -8,24 +8,19 @@ const isAdminDashboard = createRouteMatcher(["/admin-panel(.*)"]);
 export default clerkMiddleware((auth, req) => {
   const { sessionClaims }: any = auth();
   if (
-    (isSellerDashboard(req) &&
-      sessionClaims?.publicMetadata?.role !== "seller") ||
-    !auth().userId
+    isSellerDashboard(req) &&
+    sessionClaims?.publicMetadata?.role !== "seller"
   ) {
     auth().protect();
     return NextResponse.redirect(new URL("/", req.url));
   }
-  if (
-    (isUserDashboard(req) && sessionClaims?.publicMetadata?.role !== "user") ||
-    !auth().userId
-  ) {
+  if (isUserDashboard(req) && sessionClaims?.publicMetadata?.role !== "user") {
     auth().protect();
     return NextResponse.redirect(new URL("/", req.url));
   }
   if (
-    (isAdminDashboard(req) &&
-      sessionClaims?.publicMetadata?.role !== "admin") ||
-    !auth().userId
+    isAdminDashboard(req) &&
+    sessionClaims?.publicMetadata?.role !== "admin"
   ) {
     auth().protect();
     return NextResponse.redirect(new URL("/", req.url));
