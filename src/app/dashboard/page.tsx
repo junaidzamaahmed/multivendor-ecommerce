@@ -104,6 +104,7 @@ export default function Dashboard() {
     }
     fetchOrders();
   }, []);
+  console.log(store);
 
   const handleCreateStore = (e: any) => {
     createStore(e, editedStoreDetails);
@@ -121,6 +122,26 @@ export default function Dashboard() {
     setIsAddAdminModalOpen(false);
   };
 
+  const totalOrders = orders.reduce((acc: any, order: any) => {
+    if (!acc.includes(order.id)) {
+      acc.push(order.id);
+    }
+    return acc;
+  }, []);
+
+  const totalRevenue = orders.reduce((acc: any, order: any) => {
+    acc += order.total;
+    return acc;
+  }, 0);
+
+  // Number of unique customers who ordered from this store
+  const customerReach = orders.reduce((acc: any, order: any) => {
+    if (!acc.includes(order.userId)) {
+      acc.push(order.userId);
+    }
+    return acc;
+  }, []);
+
   const StoreMetrics = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       <Card>
@@ -129,17 +150,7 @@ export default function Dashboard() {
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            $
-            {store?.orders?.reduce(
-              (acc: any, order: any) =>
-                acc +
-                order.products?.reduce(
-                  (acc: any, product: any) => acc + product.price
-                ),
-              0
-            ) || 0}
-          </div>
+          <div className="text-2xl font-bold">${totalRevenue}</div>
           <p className="text-xs text-muted-foreground">
             +20.1% from last month
           </p>
@@ -151,7 +162,7 @@ export default function Dashboard() {
           <ShoppingCart className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{store?.orders?.length}</div>
+          <div className="text-2xl font-bold">{totalOrders.length}</div>
           <p className="text-xs text-muted-foreground">+19% from last month</p>
         </CardContent>
       </Card>
@@ -173,17 +184,7 @@ export default function Dashboard() {
           <Users className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">
-            {
-              // Unique number of users who ordered from this store
-              store?.orders?.reduce((acc: any, order: any) => {
-                if (!acc.includes(order.userId)) {
-                  acc.append(order.userId);
-                }
-                return acc;
-              }, []).length
-            }
-          </div>
+          <div className="text-2xl font-bold">{customerReach.length}</div>
           <p className="text-xs text-muted-foreground">
             +573 new customers this month
           </p>
